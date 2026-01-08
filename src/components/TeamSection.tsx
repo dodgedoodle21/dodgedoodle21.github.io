@@ -4,34 +4,29 @@ import { Github, Linkedin, Mail } from "lucide-react";
 
 const team = [
   {
-    name: "Team Member 1",
-    role: "Project Lead",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=lead",
+    name: "Aiden McKnight",
+    role: "Team Lead, Safety Officer, Documentation",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=aiden",
   },
   {
-    name: "Team Member 2",
-    role: "VR Developer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=vr",
+    name: "Ruby Melton",
+    role: "Design Lead, Failure Analyst",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ruby",
   },
   {
-    name: "Team Member 3",
-    role: "Physics Engineer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=physics",
+    name: "Cody Penman",
+    role: "Documentation Lead, Social Media",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=cody",
   },
   {
-    name: "Team Member 4",
-    role: "3D Artist",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=artist",
+    name: "Alex Shores",
+    role: "Quality Control, Materials Manager",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
   },
   {
-    name: "Team Member 5",
-    role: "UX Designer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ux",
-  },
-  {
-    name: "Team Member 6",
-    role: "Technical Writer",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=writer",
+    name: "Ben Bacon",
+    role: "Programming Lead, Fabrication Lead",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=ben",
   },
 ];
 
