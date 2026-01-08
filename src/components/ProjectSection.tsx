@@ -78,7 +78,7 @@ export const ProjectSection = () => {
             className="grid grid-cols-2 gap-4"
           >
             {[
-              { value: "6+", label: "Team Members" },
+              { value: "5", label: "Team Members" },
               { value: "200+", label: "Hours Development" },
               { value: "99.7%", label: "Physics Accuracy" },
               { value: "2026", label: "Competition Year" },
