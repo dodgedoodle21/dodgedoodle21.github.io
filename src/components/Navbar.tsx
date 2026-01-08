@@ -15,7 +15,7 @@ export const Navbar = () => {
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-4xl"
+      className="fixed top-4 left-0 right-0 mx-auto z-50 w-[90%] max-w-4xl"
     >
       <div className="glass-nav rounded-full px-6 py-3 flex items-center justify-between">
         <a href="#" className="flex items-center gap-2 font-display font-bold text-lg">
