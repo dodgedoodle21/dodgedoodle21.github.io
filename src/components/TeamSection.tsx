@@ -48,7 +48,7 @@ export const TeamSection = () => {
           <img 
             src={teamLogo} 
             alt="Team Logo" 
-            className="w-32 h-32 mx-auto mb-6 object-contain"
+            className="w-48 h-48 mx-auto mb-6 object-contain"
           />
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             Meet Our <span className="gradient-text">Team</span>
