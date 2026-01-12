@@ -67,13 +67,6 @@ export const TeamSection = () => {
               transition={{ duration: 0.6, delay: index * 0.1 }}
               className="glass-card p-6 text-center group hover:border-primary/50 transition-all duration-300"
             >
-              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-muted border-2 border-primary/20 group-hover:border-primary/50 transition-colors">
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
               <h3 className="font-display font-semibold text-lg">{member.name}</h3>
               <p className="text-sm text-primary mb-4">{member.role}</p>
               <div className="flex justify-center gap-3">
