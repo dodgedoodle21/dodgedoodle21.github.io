@@ -1,6 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import { Github, Linkedin, Mail } from "lucide-react";
+import teamLogo from "@/assets/team-logo.png";
 
 const team = [
   {
@@ -44,6 +45,11 @@ export const TeamSection = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
+          <img 
+            src={teamLogo} 
+            alt="Team Logo" 
+            className="w-32 h-32 mx-auto mb-6 object-contain"
+          />
           <h2 className="font-display text-3xl md:text-5xl font-bold mb-4">
             Meet Our <span className="gradient-text">Team</span>
           </h2>
