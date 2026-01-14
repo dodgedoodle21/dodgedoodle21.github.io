@@ -1,16 +1,37 @@
 import { motion } from "framer-motion";
 import { Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 const navLinks = [
-  { name: "About", href: "#about", isAnchor: true },
+  { name: "About", href: "/#about", isAnchor: true },
   { name: "Project", href: "/project", isAnchor: false },
-  { name: "Team", href: "#team", isAnchor: true },
-  { name: "Contact", href: "#contact", isAnchor: true },
+  { name: "Team", href: "/#team", isAnchor: true },
+  { name: "Contact", href: "/#contact", isAnchor: true },
 ];
 
 export const Navbar = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const [path, hash] = href.split('#');
+    
+    if (location.pathname !== '/') {
+      // Navigate to home first, then scroll to section
+      navigate('/');
+      setTimeout(() => {
+        const element = document.getElementById(hash);
+        element?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      // Already on home, just scroll
+      const element = document.getElementById(hash);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
@@ -30,7 +51,8 @@ export const Navbar = () => {
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+                onClick={(e) => handleAnchorClick(e, link.href)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer"
               >
                 {link.name}
               </a>
@@ -46,8 +68,10 @@ export const Navbar = () => {
           ))}
         </div>
 
-        <Button variant="default" size="sm" className="rounded-full glow-primary">
-          NASA HUNCH
+        <Button asChild variant="default" size="sm" className="rounded-full glow-primary">
+          <a href="https://www.nasahunch.com/" target="_blank" rel="noopener noreferrer">
+            NASA HUNCH
+          </a>
         </Button>
       </div>
     </motion.nav>
