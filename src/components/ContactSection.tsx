@@ -36,7 +36,7 @@ export const ContactSection = () => {
                   <Mail className="w-5 h-5 text-primary" />
                 </div>
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">eriehsvrsim@gmail.com</p>
+                <p className="font-medium">eriehighvrsim@gmail.com</p>
               </div>
               <div className="flex flex-col items-center">
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
