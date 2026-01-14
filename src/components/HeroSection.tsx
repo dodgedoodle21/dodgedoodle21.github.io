@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Play } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-space.jpg";
 export const HeroSection = () => {
   return <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-space-gradient">
@@ -51,13 +52,17 @@ export const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Button size="lg" className="rounded-full glow-primary group">
-                Explore Project
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <Button asChild size="lg" className="rounded-full glow-primary group">
+                <Link to="/project">
+                  Explore Project
+                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </Link>
               </Button>
-              <Button variant="outline" size="lg" className="rounded-full border-glass-border hover:bg-card/50">
-                <Play className="mr-2 w-4 h-4" />
-                Watch Demo
+              <Button asChild variant="outline" size="lg" className="rounded-full border-glass-border hover:bg-card/50">
+                <a href="#contact">
+                  <Play className="mr-2 w-4 h-4" />
+                  Contact Us
+                </a>
               </Button>
             </div>
           </motion.div>
