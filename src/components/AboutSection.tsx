@@ -20,10 +20,5 @@ const features = [{
   description: "Track performance, reaction times, and mission completion rates."
 }];
 export const AboutSection = () => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, {
-    once: true,
-    margin: "-100px"
-  });
-  return;
+  return <section id="about" className="py-24 relative bg-background" />;
 };

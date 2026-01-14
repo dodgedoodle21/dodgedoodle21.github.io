@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 
 const navLinks = [
-  { name: "About", href: "#about", isAnchor: true },
-  { name: "Project", href: "/project", isAnchor: false },
-  { name: "Team", href: "#team", isAnchor: true },
-  { name: "Contact", href: "#contact", isAnchor: true },
+  { name: "About", href: "/" },
+  { name: "Project", href: "/project" },
+  { name: "Team", href: "/#team" },
+  { name: "Contact", href: "/#contact" },
 ];
 
 export const Navbar = () => {
@@ -26,23 +26,13 @@ export const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            link.isAnchor ? (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {link.name}
-              </a>
-            ) : (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
-              >
-                {link.name}
-              </Link>
-            )
+            <Link
+              key={link.name}
+              to={link.href}
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200"
+            >
+              {link.name}
+            </Link>
           ))}
         </div>
 
