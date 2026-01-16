@@ -50,7 +50,7 @@ export const ContactSection = () => {
                   <MapPin className="w-5 h-5 text-primary" />
                 </div>
                 <p className="text-sm text-muted-foreground">Location</p>
-                <p className="font-medium">United States</p>
+                <p className="font-medium">Colorado, United States</p>
               </div>
             </div>
           </div>
