@@ -59,9 +59,9 @@ export const HeroSection = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-glass-border hover:bg-card/50">
-                <a href="mailto:eriehighvrsim@gmail.com">
+                <a href="https://www.canva.com/design/DAG19fplWQU/4L1Cb8-_wtygj4lOBsIlfg/edit?utm_content=DAG19fplWQU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton" target="_blank" rel="noopener noreferrer">
                   <Play className="mr-2 w-4 h-4" />
-                  Contact Us
+                  CDR Presentation
                 </a>
               </Button>
             </div>
