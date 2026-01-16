@@ -55,9 +55,11 @@ export const ContactSection = () => {
             </div>
           </div>
 
-          <Button size="lg" className="rounded-full glow-primary group">
-            Contact Us
-            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <Button asChild size="lg" className="rounded-full glow-primary group">
+            <a href="mailto:eriehighvrsim@gmail.com">
+              Contact Us
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </a>
           </Button>
         </motion.div>
       </div>

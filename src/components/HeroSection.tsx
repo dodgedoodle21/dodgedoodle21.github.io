@@ -59,7 +59,7 @@ export const HeroSection = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full border-glass-border hover:bg-card/50">
-                <a href="#contact">
+                <a href="mailto:eriehighvrsim@gmail.com">
                   <Play className="mr-2 w-4 h-4" />
                   Contact Us
                 </a>
