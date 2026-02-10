@@ -73,8 +73,8 @@ const features = [
     description: "An open sandbox environment to freely experiment with zero-gravity interactions and scenarios."
   },
   {
-    title: "Training Modules",
-    description: "Structured training scenarios for astronaut preparation."
+    title: "Real-Time Metrics",
+    description: "Track G-forces, realistic HUD overlays, and live mission telemetry data."
   },
 ];
 
