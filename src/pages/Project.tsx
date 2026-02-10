@@ -69,8 +69,8 @@ const features = [
     description: "Full 360° virtual reality experience with intuitive controls."
   },
   {
-    title: "Multiple Environments",
-    description: "Simulate gravity on Moon, Mars, ISS, and other celestial bodies."
+    title: "Virtual Playground",
+    description: "An open sandbox environment to freely experiment with zero-gravity interactions and scenarios."
   },
   {
     title: "Training Modules",
