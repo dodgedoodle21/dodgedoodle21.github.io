@@ -16,8 +16,8 @@ const features = [
   },
   {
     icon: Brain,
-    title: "Adaptive Training",
-    description: "AI-driven scenarios that adapt to trainee skill levels and progress.",
+    title: "Virtual Playground",
+    description: "An open sandbox environment to freely experiment with zero-gravity interactions and scenarios.",
   },
   {
     icon: Gauge,
