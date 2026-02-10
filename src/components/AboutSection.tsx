@@ -22,7 +22,7 @@ const features = [
   {
     icon: Gauge,
     title: "Real-time Metrics",
-    description: "Track performance, reaction times, and mission completion rates.",
+    description: "Track G-forces, realistic HUD overlays, and live mission telemetry data.",
   },
 ];
 
