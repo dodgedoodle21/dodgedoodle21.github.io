@@ -1,5 +1,6 @@
-import { motion } from "framer-motion";
-import { Rocket } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Rocket, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -15,20 +16,20 @@ const navLinks = [
 export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleAnchorClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const [path, hash] = href.split('#');
+    setMobileOpen(false);
     
     if (location.pathname !== '/') {
-      // Navigate to home first, then scroll to section
       navigate('/');
       setTimeout(() => {
         const element = document.getElementById(hash);
         element?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     } else {
-      // Already on home, just scroll
       const element = document.getElementById(hash);
       element?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -70,12 +71,60 @@ export const Navbar = () => {
           ))}
         </div>
 
-        <Button asChild variant="default" size="sm" className="rounded-full glow-primary">
-          <a href="https://www.nasahunch.com/" target="_blank" rel="noopener noreferrer">
-            NASA HUNCH
-          </a>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="default" size="sm" className="rounded-full glow-primary hidden md:inline-flex">
+            <a href="https://www.nasahunch.com/" target="_blank" rel="noopener noreferrer">
+              NASA HUNCH
+            </a>
+          </Button>
+          <button
+            className="md:hidden p-2 text-muted-foreground hover:text-foreground transition-colors"
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
+
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden mt-2 glass-nav rounded-2xl px-6 py-4 flex flex-col gap-3"
+          >
+            {navLinks.map((link) => (
+              link.isAnchor ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={(e) => handleAnchorClick(e, link.href)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 cursor-pointer py-1"
+                >
+                  {link.name}
+                </a>
+              ) : (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 py-1"
+                >
+                  {link.name}
+                </Link>
+              )
+            ))}
+            <Button asChild variant="default" size="sm" className="rounded-full glow-primary mt-2 w-full">
+              <a href="https://www.nasahunch.com/" target="_blank" rel="noopener noreferrer">
+                NASA HUNCH
+              </a>
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
