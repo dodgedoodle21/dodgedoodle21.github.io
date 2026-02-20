@@ -7,6 +7,7 @@ const navLinks = [
   { name: "About", href: "/#about", isAnchor: true },
   { name: "Project", href: "/project", isAnchor: false },
   { name: "Testing Data", href: "/testing-data", isAnchor: false },
+  { name: "Research", href: "/research", isAnchor: false },
   { name: "Team", href: "/#team", isAnchor: true },
   { name: "Contact", href: "/#contact", isAnchor: true },
 ];
