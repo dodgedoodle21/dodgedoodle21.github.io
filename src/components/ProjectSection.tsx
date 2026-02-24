@@ -6,8 +6,8 @@ const milestones = [
   { title: "Research & Concept Development", status: "complete" },
   { title: "Hardware Integration Testing", status: "complete" },
   { title: "Physics Engine Development", status: "complete" },
-  { title: "VR Environment Design", status: "in-progress" },
-  { title: "User Testing & Validation", status: "upcoming" },
+  { title: "VR Environment Design", status: "complete" },
+  { title: "User Testing & Validation", status: "in-progress" },
   { title: "NASA CDR Presentation", status: "upcoming" },
 ];
 
