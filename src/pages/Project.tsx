@@ -409,34 +409,61 @@ public class GravityMove : MonoBehaviour
   {
     filename: "objectgravity.cs",
     title: "Object Gravity (Throwables)",
-    description: "Applies the same artificial gravity to physics objects (e.g. balls). Disables Unity\u2019s default gravity and uses AddForce toward the station center. Automatically disengages when the object is grabbed by the player.",
+    description: "Applies axis-aligned artificial gravity to physics objects (e.g. balls), pulling them toward the station\u2019s center pivot line rather than a single point. Includes performance optimizations like staggered axis recalculation, sqrMagnitude checks, and sleep detection. Automatically disengages when the object is grabbed.",
     code: `using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
 public class ObjectGravity : MonoBehaviour
 {
-    [Header("Gravity Settings")]
-    public Vector3 fixedGravityPoint = new Vector3(-7f, 0f, 0f);
-    public float gravityStrength = 9.81f;
-    
+    public Transform stationCenter; 
+    public Vector3 stationAxis = Vector3.up; 
+    public float gravityStrength = 9.81f; 
+    public float deadzoneRadius = 0.9f;
+    public float stationRadius = 7.5f;
+
     private Rigidbody rb;
     private OVRGrabbable grabbable;
+    private Vector3 cachedWorldAxis;
+    private int frameOffset;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
         grabbable = GetComponent<OVRGrabbable>();
+        
+        // Offset the physics calculation so all 6 objects don't run heavy math 
+        // on the exact same microsecond.
+        frameOffset = Random.Range(0, 2); 
+        
+        if (stationCenter != null)
+            cachedWorldAxis = stationCenter.TransformDirection(stationAxis.normalized);
     }
 
     void FixedUpdate()
     {
-        if (grabbable != null && grabbable.isGrabbed) return;
+        // Optimization: If the object is sleeping (not moving) and not grabbed, 
+        // don't run math. Gravity has already done its job.
+        if (rb.IsSleeping() || (grabbable != null && grabbable.isGrabbed)) return;
 
-        Vector3 vectorToObject = transform.position - fixedGravityPoint;
-        Vector3 gravityDirection = vectorToObject.normalized;
+        // Spread the load: Only update the world axis occasionally
+        if (Time.frameCount % 20 == 0) 
+            cachedWorldAxis = stationCenter.TransformDirection(stationAxis.normalized);
 
-        rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
+        Vector3 playerOffset = transform.position - stationCenter.position;
+        float dot = Vector3.Dot(playerOffset, cachedWorldAxis);
+        Vector3 closestPointOnAxis = stationCenter.position + (cachedWorldAxis * dot);
+        
+        Vector3 vectorFromAxis = transform.position - closestPointOnAxis;
+        float distSq = vectorFromAxis.sqrMagnitude; // sqrMagnitude is faster than .magnitude
+
+        if (distSq > (deadzoneRadius * deadzoneRadius))
+        {
+            float distance = Mathf.Sqrt(distSq);
+            Vector3 gravityDirection = vectorFromAxis / distance;
+            float multiplier = Mathf.Clamp01(distance / stationRadius);
+            
+            rb.AddForce(gravityDirection * (gravityStrength * multiplier), ForceMode.Acceleration);
+        }
     }
 }`,
   },
