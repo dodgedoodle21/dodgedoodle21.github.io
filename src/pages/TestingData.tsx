@@ -195,6 +195,132 @@ const tests = [
       { label: "Result", text: 'The ball now bounces realistically off the curved station hull.' },
     ],
   },
+  {
+    number: 20,
+    title: 'Proper Gravity Vector (Axis vs. Point)',
+    entries: [
+      { label: "Observation", text: 'Gravity was pulling the player toward the geometric center of the station (a single point), causing the player to lean inward like they were standing on a small planet rather than a flat floor.' },
+      { label: "Change", text: 'Replaced the \u201CPoint Gravity\u201D math with \u201CAxis Gravity.\u201D Projected the player\u2019s position onto the stationAxis to find the closest point on the center line.' },
+      { label: "Result", text: 'Gravity now pulls perfectly \u201Cdown\u201D toward the hull floor relative to the station\u2019s rotation, creating a true cylindrical gravity feel.' },
+    ],
+  },
+  {
+    number: 21,
+    title: 'Player Headset Display Lag (The \u201CStutter\u201D Fix)',
+    entries: [
+      { label: "Observation", text: 'Moving the head in VR felt \u201Cheavy\u201D and lagged behind physical movement, leading to instant motion sickness.' },
+      { label: "Change", text: 'Moved camera/rotation processing from FixedUpdate (50Hz) to Update (Variable/High) and ensured Rigidbody.interpolation was set to Interpolate.' },
+      { label: "Result", text: 'The display now matches the monitor\u2019s 165Hz refresh rate, providing buttery-smooth head tracking.' },
+    ],
+  },
+  {
+    number: 22,
+    title: 'Vertical Movement Math (The \u201CRocket Boost\u201D Fix)',
+    entries: [
+      { label: "Observation", text: 'Climbing or descending felt exponential. The longer the key was held, the faster the player went, eventually shooting out of the station.' },
+      { label: "Change", text: 'Identified that vertical velocity was being added per-frame without a cap. Changed the logic to a \u201CConstant Velocity\u201D override where the player moves at a fixed climbSpeed when input is detected.' },
+      { label: "Result", text: 'Vertical movement is now steady, predictable, and stops the moment the key is released.' },
+    ],
+  },
+  {
+    number: 23,
+    title: 'Ball Physics & Proper Gravity',
+    entries: [
+      { label: "Observation", text: 'Physics objects (the balls) were floating aimlessly or falling toward the world\u2019s \u201CDown\u201D (Y-0) instead of the station\u2019s floor.' },
+      { label: "Change", text: 'Created a dedicated gravity script for the balls that mirrors the player\u2019s Axis Gravity logic, applying a constant AddForce toward the nearest point on the hull.' },
+      { label: "Result", text: 'Balls now roll along the floor and settle in the \u201Cbottom\u201D of the cylinder as expected.' },
+    ],
+  },
+  {
+    number: 24,
+    title: 'Physics Object Lag (The \u201CGhosting\u201D Balls)',
+    entries: [
+      { label: "Observation", text: 'When the station moved or the player threw a ball, the ball appeared to vibrate or leave a trail, making it hard to catch.' },
+      { label: "Change", text: 'Enabled Continuous Dynamic collision detection and set Interpolation to Interpolate on the ball Rigidbodies to sync them with the high-refresh monitor.' },
+      { label: "Result", text: 'Objects now move through the air with clear, sharp frames even at high speeds.' },
+    ],
+  },
+  {
+    number: 25,
+    title: 'Gravity Deadzone Implementation',
+    entries: [
+      { label: "Observation", text: 'At the very center of the station, the gravity was \u201Cflipping\u201D back and forth rapidly, causing the player to shake violently.' },
+      { label: "Change", text: 'Implemented a deadzoneRadius of 0.9m. If the player is within this distance from the center axis, gravity force is set to zero.' },
+      { label: "Result", text: 'Created a stable \u201CZero-G\u201D corridor in the middle of the station for seamless floating.' },
+    ],
+  },
+  {
+    number: 26,
+    title: 'Smooth Rotation (The \u201CAnti-Nausea\u201D Spin)',
+    entries: [
+      { label: "Observation", text: 'The player would \u201Csnap\u201D their rotation to match the floor instantly, causing the camera to jerk and the player\u2019s head to clip through walls during sharp turns.' },
+      { label: "Change", text: 'Replaced instant rotation with Quaternion.RotateTowards using a maxTiltSpeed.' },
+      { label: "Result", text: 'The player\u2019s body now \u201Cbanks\u201D smoothly into the station\u2019s curve, preventing clipping and reducing motion-induced nausea.' },
+    ],
+  },
+  {
+    number: 27,
+    title: 'G-Meter UI Implementation',
+    entries: [
+      { label: "Observation", text: 'It was impossible to tell if gravity was working correctly or if the player was in the Deadzone without looking at the code.' },
+      { label: "Change", text: 'Added a TextMeshPro UI element that tracks the player\u2019s distance from the axis.' },
+      { label: "Result", text: 'Real-time feedback for the player, confirming \u201CZERO-G\u201D status or gravity strength.' },
+    ],
+  },
+  {
+    number: 28,
+    title: 'UI Calibration (m/s\u00B2 vs Earth Gs)',
+    entries: [
+      { label: "Observation", text: 'The UI was showing a 0-to-1 ratio, which felt like a \u201Cpercentage\u201D rather than a scientific measurement.' },
+      { label: "Change", text: 'Updated the math to multiply the gravity ratio by gravityStrength (9.81).' },
+      { label: "Result", text: 'The UI now displays \u201CActual Gs\u201D in m/s\u00B2, showing 9.81 when standing on the floor.' },
+    ],
+  },
+  {
+    number: 29,
+    title: 'Desktop Player Integration',
+    entries: [
+      { label: "Observation", text: 'Testing required a VR headset every time, making quick physics tweaks slow and tedious.' },
+      { label: "Change", text: 'Added a \u201CDesktop\u201D mode with WASD and Mouse controls, allowing for rapid testing on a flat monitor.' },
+      { label: "Result", text: 'Simultaneous development is now possible, with one person in VR and another on PC.' },
+    ],
+  },
+  {
+    number: 31,
+    title: 'Mouse Smoothing & Horizontal Tear Fix',
+    entries: [
+      { label: "Observation", text: 'Looking horizontally on the PC was extremely choppy and caused massive screen tearing at 165Hz.' },
+      { label: "Change", text: 'Moved Horizontal Yaw to rb.MoveRotation in Update and implemented QualitySettings.vSyncCount = 1.' },
+      { label: "Result", text: 'Eliminated the \u201Cjagged\u201D horizontal edges and synced the mouse movement to the monitor\u2019s refresh cycle.' },
+    ],
+  },
+  {
+    number: 32,
+    title: 'Framerate & Sync Optimization',
+    entries: [
+      { label: "Observation", text: 'The game was running at \u201Cinfinite\u201D FPS, making the GPU run hot and causing inconsistent physics steps.' },
+      { label: "Change", text: 'Set Application.targetFrameRate = 165 and adjusted the Fixed Timestep to 0.006 in Project Settings.' },
+      { label: "Result", text: 'The physics engine and the render engine are now perfectly \u201Cin phase,\u201D resulting in a stable, high-performance experience.' },
+    ],
+  },
+  {
+    number: 33,
+    title: 'Multi-User Collision Masking',
+    entries: [
+      { label: "Observation", text: 'When both the Desktop and VR players attempted to occupy the same space, the physics engine caused them to \u201Cjitter-fight,\u201D occasionally launching one player through the station mesh.' },
+      { label: "Change", text: 'Implemented a Layer Collision Matrix. Created DesktopPlayer and VRPlayer layers and disabled their mutual collision.' },
+      { label: "Result", text: 'Players can now overlap or pass through each other during testing without triggering physics \u201Cexplosions,\u201D while still maintaining individual collision with the station floor.' },
+    ],
+  },
+  {
+    number: 34,
+    title: 'The \u201CSub-Step\u201D Gravity Accuracy',
+    entries: [
+      { label: "Observation", text: 'At high frame rates, gravity felt \u201Clight\u201D or inconsistent because the force was being applied less frequently than the frames were being drawn.' },
+      { label: "Change", text: 'Lowered the Fixed Timestep to 0.006.' },
+      { label: "Result", text: 'Gravity now feels \u201Cheavy\u201D and consistent. Objects settle on the floor with zero micro-bouncing, even on high-refresh displays.' },
+    ],
+  },
 ];
 
 const TestingData = () => {
@@ -250,9 +376,10 @@ const TestingData = () => {
           >
             <h2 className="font-display text-2xl font-bold mb-6 text-primary">Current Build Status</h2>
             <div className="space-y-3">
-              <p className="text-muted-foreground"><Label>Stability:</Label> High. No more falling through the world or seizure flashes.</p>
-              <p className="text-muted-foreground"><Label>Performance:</Label> Optimized by removing physical station rotation.</p>
-              <p className="text-muted-foreground"><Label>Control:</Label> Forward is look-relative, allowing for intuitive VR navigation.</p>
+              <p className="text-muted-foreground"><Label>Stability:</Label> Industrial Grade. The &ldquo;FixedUpdate Trap&rdquo; has been eliminated. Physics interpolation ensures that players and objects remain grounded and jitter-free, even during high-speed movement or transition into Zero-G.</p>
+              <p className="text-muted-foreground"><Label>Performance:</Label> Synchronized (165Hz). The engine is now hard-locked to the monitor&rsquo;s refresh rate with a matching 0.006 physics timestep. This has removed the &ldquo;stroboscopic&rdquo; effect during horizontal pans and significantly reduced GPU overhead.</p>
+              <p className="text-muted-foreground"><Label>Control:</Label> Hybrid-Fluidity. Movement is now &ldquo;Look-Relative&rdquo; across both platforms. The Desktop player enjoys 1:1 mouse precision with calibrated sensitivity (X: 0.025, Y: 0.555), while the VR player benefits from lag-free head tracking and smoothed banking.</p>
+              <p className="text-muted-foreground"><Label>Physics:</Label> True Toroidal Gravity. By transitioning from point-source to axis-aligned gravity, the station now correctly simulates centrifugal force. The 0.9m deadzone allows for a distinct, stable Zero-G corridor at the station&rsquo;s core.</p>
             </div>
           </motion.div>
         </div>
