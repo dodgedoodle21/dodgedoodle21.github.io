@@ -224,46 +224,44 @@ public class SkyboxSpinner : MonoBehaviour
   {
     filename: "movegravity.cs",
     title: "Gravity-Aware Movement",
-    description: "Rigidbody-based movement that respects artificial gravity orientation. Projects camera vectors onto the player\u2019s local \u201Cup\u201D plane and includes ladder-climbing logic via right thumbstick vertical input.",
-    code: `using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+    description: "Rigidbody-based movement with zero-G and 1G mode detection. Projects camera vectors onto the player\u2019s local \u201Cup\u201D plane, includes ladder-climbing logic, and switches between coasting (0G) and walking (1G) based on distance from the station\u2019s spin axis.",
+    code: `using UnityEngine;
 
 public class GravityMove : MonoBehaviour
 {
+    [Header("References")]
     public Camera sceneCamera;
-    public float moveSpeed = 1.0f;
-    public float rotationSpeed = 20.0f;
-    public float climbSpeed = 1.0f;
-    
+    public Transform stationCenter;
+    public Vector3 stationAxis = Vector3.up; 
+
+    [Header("Movement Settings")]
+    public float moveSpeed = 3.0f;
+    public float climbSpeed = 2.0f; 
+
+    [Header("Zero-G Settings")]
+    public float deadzoneRadius = 0.9f; // MUST match ArtificialGravity!
+
     private Rigidbody rb;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
     }
 
     void FixedUpdate()
     {
-        HandleRotation();
         HandleMovement();
-    }
-
-    void HandleRotation()
-    {
-        if (OVRInput.Get(OVRInput.RawButton.RThumbstickLeft))
-            transform.Rotate(0, -rotationSpeed * Time.fixedDeltaTime, 0, Space.Self);
-
-        if (OVRInput.Get(OVRInput.RawButton.RThumbstickRight))
-            transform.Rotate(0, rotationSpeed * Time.fixedDeltaTime, 0, Space.Self);
     }
 
     void HandleMovement()
     {
+        if (stationCenter == null || sceneCamera == null) return;
+
+        // 1. Calculate where "Forward" is based on where you are looking
         Vector3 forward = sceneCamera.transform.forward;
         Vector3 right = sceneCamera.transform.right;
 
+        // Flatten the direction to the player's 'Up' so you don't fly into the floor
         forward = Vector3.ProjectOnPlane(forward, transform.up).normalized;
         right = Vector3.ProjectOnPlane(right, transform.up).normalized;
 
@@ -277,21 +275,47 @@ public class GravityMove : MonoBehaviour
         if (OVRInput.Get(OVRInput.RawButton.RThumbstickUp)) climbDir = transform.up * climbSpeed;
         if (OVRInput.Get(OVRInput.RawButton.RThumbstickDown)) climbDir = -transform.up * climbSpeed;
 
-        if (inputDir != Vector3.zero || climbDir != Vector3.zero)
+        // 2. CHECK IF WE ARE IN 0G OR GRAVITY
+        Vector3 worldAxis = stationCenter.TransformDirection(stationAxis.normalized);
+        Vector3 playerOffset = transform.position - stationCenter.position;
+        float projectionDistance = Vector3.Dot(playerOffset, worldAxis);
+        Vector3 closestPointOnAxis = stationCenter.position + (worldAxis * projectionDistance);
+        
+        float distanceFromAxis = Vector3.Distance(transform.position, closestPointOnAxis);
+        bool inZeroG = distanceFromAxis <= deadzoneRadius;
+
+        // 3. APPLY MOVEMENT
+        if (inZeroG)
         {
-            if (climbDir != Vector3.zero)
+            // === 0G MODE: Coasting ===
+            if (inputDir != Vector3.zero || climbDir != Vector3.zero)
             {
+                // Apply thrust when pressing the stick
                 rb.linearVelocity = (inputDir.normalized * moveSpeed) + climbDir;
             }
-            else
-            {
-                Vector3 verticalVelocity = Vector3.Project(rb.linearVelocity, transform.up);
-                rb.linearVelocity = (inputDir.normalized * moveSpeed) + verticalVelocity;
-            }
+            // Notice there is NO "else" statement here. 
+            // If you let go of the stick, we do nothing. The physics engine lets you coast!
         }
         else
         {
-            rb.linearVelocity = Vector3.Project(rb.linearVelocity, transform.up);
+            // === 1G MODE: Walking & Stopping ===
+            if (inputDir != Vector3.zero || climbDir != Vector3.zero)
+            {
+                if (climbDir != Vector3.zero)
+                {
+                    rb.linearVelocity = (inputDir.normalized * moveSpeed) + climbDir;
+                }
+                else
+                {
+                    Vector3 verticalVelocity = Vector3.Project(rb.linearVelocity, transform.up);
+                    rb.linearVelocity = (inputDir.normalized * moveSpeed) + verticalVelocity;
+                }
+            }
+            else
+            {
+                // Brakes! Instantly stop horizontal walking, but keep falling/jumping
+                rb.linearVelocity = Vector3.Project(rb.linearVelocity, transform.up);
+            }
         }
     }
 }`,
