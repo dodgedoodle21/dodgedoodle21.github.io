@@ -152,50 +152,136 @@ public class ControllerScript : MonoBehaviour
   {
     filename: "actualgravity.cs",
     title: "Artificial Gravity System",
-    description: "Applies centripetal artificial gravity by pulling the player toward a fixed gravity center point. Uses Rigidbody physics in FixedUpdate for stability and smooth Slerp rotation alignment in Update for visual fidelity.",
+    description: "Applies centripetal artificial gravity using the station\u2019s spin axis (a line, not a single point) for physically accurate force direction. Features smoothed thumbstick turning, a tilt-speed limiter to prevent disorienting flips, a zero-G deadzone near the axis, and Rigidbody interpolation for jitter-free visuals.",
     code: `using UnityEngine;
 
 public class ArtificialGravity : MonoBehaviour
 {
-    public Vector3 fixedGravityPoint = new Vector3(-7f, 0f, 0f);
-    public float gravityStrength = 9.81f;
-    public float rotationSmoothSpeed = 20f;
-    
+    [Header("Station Alignment")]
+    public Transform stationCenter; 
+    public Vector3 stationAxis = Vector3.up; 
+    public float stationRadius = 7.5f; 
+
+    [Header("Physics Settings")]
+    public float gravityStrength = 9.81f; 
+    public float turnSpeed = 100f; 
+    public float maxTiltSpeed = 75f; // THE FIX: Speed limit for flipping (degrees per second)
+
+    [Header("Stability Settings")]
+    public float deadzoneRadius = 0.9f; 
+
     private Rigidbody rb;
-    private Quaternion targetRotation;
+    private Quaternion targetRotation; 
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         rb.freezeRotation = true;
+        
+        // THE SMOOTHNESS FIX: This tells Unity's engine to do the visual smoothing automatically
+        // between physics frames. This replaces the need for an Update() loop entirely!
+        rb.interpolation = RigidbodyInterpolation.Interpolate;
+        
+        targetRotation = transform.rotation;
     }
+
+    [Header("Turning Smoothness")]
+    public float turnSmoothSpeed = 30f;
+    private float currentTurnVelocity = 0f;
 
     void FixedUpdate()
     {
-        Vector3 vectorToPlayer = transform.position - fixedGravityPoint;
-        Vector3 gravityDirection = vectorToPlayer.normalized;
+    if (stationCenter == null) return;
 
-        rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
+    // 1. STATION MATH - Uses axis LINE, not a single point
+    Vector3 worldAxis = stationCenter.TransformDirection(stationAxis.normalized);
+    Vector3 playerOffset = transform.position - stationCenter.position;
+    float projectionDistance = Vector3.Dot(playerOffset, worldAxis);
+    Vector3 closestPointOnAxis = stationCenter.position + (worldAxis * projectionDistance);
+    
+    Vector3 vectorFromAxis = transform.position - closestPointOnAxis;
+    float distanceFromAxis = vectorFromAxis.magnitude;
+    if (distanceFromAxis < 0.001f) return; 
 
-        Vector3 targetUp = -gravityDirection;
-        Vector3 forwardOnFloor = Vector3.ProjectOnPlane(transform.forward, targetUp);
+    Vector3 stationUp = vectorFromAxis.normalized;
 
-        if (forwardOnFloor.sqrMagnitude > 0.01f)
-        {
-            targetRotation = Quaternion.LookRotation(forwardOnFloor.normalized, targetUp);
-        }
+    // 2. APPLY GRAVITY FORCE
+    if (distanceFromAxis > deadzoneRadius)
+    {
+        float gravityMultiplier = Mathf.Clamp01(distanceFromAxis / stationRadius);
+        rb.AddForce(stationUp * (gravityStrength * gravityMultiplier), ForceMode.Acceleration);
+    }
 
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation, targetRotation, rotationSmoothSpeed * Time.deltaTime
-        );
+    // 3. CAPTURE TURNING INPUT (Smoothed)
+    float targetTurnInput = 0f;
+    if (OVRInput.Get(OVRInput.RawButton.RThumbstickLeft)) targetTurnInput = -turnSpeed;
+    if (OVRInput.Get(OVRInput.RawButton.RThumbstickRight)) targetTurnInput = turnSpeed;
+
+    currentTurnVelocity = Mathf.Lerp(currentTurnVelocity, targetTurnInput, turnSmoothSpeed * Time.fixedDeltaTime);
+
+    // 4. CALCULATION OF THE TARGET ROTATION
+    Quaternion yawRot = Quaternion.AngleAxis(currentTurnVelocity * Time.fixedDeltaTime, Vector3.up);
+    
+    if (distanceFromAxis > deadzoneRadius)
+    {
+        Vector3 targetUp = -stationUp;
+        Quaternion tiltCorrection = Quaternion.FromToRotation(rb.rotation * Vector3.up, targetUp);
+        Quaternion idealRotation = tiltCorrection * rb.rotation * yawRot;
+        targetRotation = Quaternion.RotateTowards(rb.rotation, idealRotation, maxTiltSpeed * Time.fixedDeltaTime);
+    }
+    else
+    {
+        targetRotation = rb.rotation * yawRot;
+        rb.angularVelocity *= 0.4f; 
+    }
+
+    rb.MoveRotation(targetRotation);
     }
 
     void Update()
     {
-        transform.rotation = Quaternion.Slerp(
-            transform.rotation, targetRotation, rotationSmoothSpeed * Time.deltaTime
-        );
+    if (stationCenter == null) return;
+
+    Vector3 worldAxis = stationCenter.TransformDirection(stationAxis.normalized);
+    Vector3 playerOffset = transform.position - stationCenter.position;
+    float projectionDistance = Vector3.Dot(playerOffset, worldAxis);
+    Vector3 closestPointOnAxis = stationCenter.position + (worldAxis * projectionDistance);
+    
+    Vector3 vectorFromAxis = transform.position - closestPointOnAxis;
+    float distanceFromAxis = vectorFromAxis.magnitude;
+    if (distanceFromAxis < 0.001f) return; 
+
+    Vector3 stationUp = vectorFromAxis.normalized;
+
+    if (distanceFromAxis > deadzoneRadius)
+    {
+        float gravityMultiplier = Mathf.Clamp01(distanceFromAxis / stationRadius);
+        rb.AddForce(stationUp * (gravityStrength * gravityMultiplier), ForceMode.Acceleration);
+    }
+
+    float targetTurnInput = 0f;
+    if (OVRInput.Get(OVRInput.RawButton.RThumbstickLeft)) targetTurnInput = -turnSpeed;
+    if (OVRInput.Get(OVRInput.RawButton.RThumbstickRight)) targetTurnInput = turnSpeed;
+
+    currentTurnVelocity = Mathf.Lerp(currentTurnVelocity, targetTurnInput, turnSmoothSpeed * Time.fixedDeltaTime);
+
+    Quaternion yawRot = Quaternion.AngleAxis(currentTurnVelocity * Time.fixedDeltaTime, Vector3.up);
+    
+    if (distanceFromAxis > deadzoneRadius)
+    {
+        Vector3 targetUp = -stationUp;
+        Quaternion tiltCorrection = Quaternion.FromToRotation(rb.rotation * Vector3.up, targetUp);
+        Quaternion idealRotation = tiltCorrection * rb.rotation * yawRot;
+        targetRotation = Quaternion.RotateTowards(rb.rotation, idealRotation, maxTiltSpeed * Time.fixedDeltaTime);
+    }
+    else
+    {
+        targetRotation = rb.rotation * yawRot;
+        rb.angularVelocity *= 0.4f; 
+    }
+
+    rb.MoveRotation(targetRotation);
     }
 }`,
   },
